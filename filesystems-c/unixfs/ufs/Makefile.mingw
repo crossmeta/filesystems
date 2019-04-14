@@ -1,0 +1,44 @@
+#
+# Makefile to build with CROSSMETA FUSE
+#
+TARGET = ufs.exe
+# Set the following variable to Crossmeta FUSE SDK directory
+#FUSE_DIR = cxfuse
+COMMON = ../common
+UNIXFS=$(COMMON)/unixfs
+LINUX=$(COMMON)/linux
+LINUX_KERNEL=$(LINUX)/kernel
+
+FUSE_LIBS = $(FUSE_DIR)/lib/w2k/free/i386
+LIBS =   -static -pthread  $(FUSE_LIBS)/libfuse.lib $(FUSE_LIBS)/cxfuse.dll   $(FUSE_LIBS)/libfs.lib $(FUSE_LIBS)/libgenm.lib -lntdll -lws2_32
+
+HOME=$(shell pwd)
+CC = i686-w64-mingw32-gcc
+CDEFINES = -DWIN32_LEAN_AND_MEAN -D_MSVCRT_ -D_POSIX -D_ALL_SOURCE -D _STAT_DEFINED -DNO_OLDNAMES -D_REENTRANT -D_INC_FCNTL  -D_INC_STDLIB -D_IO_H_ -D_LIBGEN_H_  -D_POSIX_C_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE  -D _TIMEVAL_DEFINED -D_TIMESPEC_DEFINED -D_TIMEZONE_DEFINED -D_TIME_H -DHAVE_FUSE_H -D__Crossmeta__=1
+CINCLUDES=-I $(COMMON)/unixfs -I$(COMMON)/linux -I $(COMMON)/linux/kernel/include -I $(COMMON)/linux/kernel/fs -I $(FUSE_DIR)/include  -I $(FUSE_DIR) -I $(FUSE_DIR)/sys
+CBUILDFLAGS = -O3 -fomit-frame-pointer -ffunction-sections -fdata-sections
+CFLAGS = -static -g -Wno-multichar $(CDEFINES) $(CINCLUDES) 
+
+.PHONY: default all clean
+
+default: $(TARGET)
+all: default
+
+OBJECTS = ufs.o ufs_mainx.o unixfs_ufs.o $(OBJS_COMMON)
+OBJS_COMMON = $(UNIXFS)/unixfs.o $(UNIXFS)/unixfs_internal.o $(LINUX)/linux.o $(LINUX_KERNEL)/lib/parser.o
+HEADERS = $(wildcard *.h)
+
+%.o: %.c $(HEADERS)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+%.o: %.cc $(HEADERS)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(TARGET): $(OBJECTS)
+	$(CC) $(OBJECTS) -o $@ $(LIBS)
+
+clean:
+	-rm -f *.o
+	-rm -f $(TARGET)
+	
+

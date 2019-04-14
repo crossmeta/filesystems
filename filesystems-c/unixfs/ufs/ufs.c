@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/ioctl.h>
+//#include <sys/ioctl.h>
 #include <sys/stat.h>
 
 #include <ufs/util.c>
@@ -206,6 +206,30 @@ ufs_print_cylinder_stuff(struct super_block* sb, struct ufs_cylinder_group* cg)
            fs32_to_cpu(sb, cg->cg_u.cg_44.cg_nclusterblks));
     printk("\n");
 }
+
+#if __Crossmeta__
+static
+char* mystrsep(char** stringp, const char* delim)
+{
+  char* start = *stringp;
+  char* p;
+
+  p = (start != NULL) ? strpbrk(start, delim) : NULL;
+
+  if (p == NULL)
+  {
+    *stringp = NULL;
+  }
+  else
+  {
+    *p = '\0';
+    *stringp = p + 1;
+  }
+
+  return start;
+}
+#define	strsep	mystrsep
+#endif
 
 static int
 ufs_parse_options(char* options, unsigned* mount_options)

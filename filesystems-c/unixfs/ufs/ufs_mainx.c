@@ -13,7 +13,12 @@
 #include <string.h>
 #include <unistd.h>
 #include <ctype.h>
+#ifndef __MINGW32__
 #include <dlfcn.h>
+#endif
+#if __Crossmeta__
+#define __private_extern__
+#endif
 
 static const char* PROGNAME = "ufs";
 static const char* PROGVERS = "1.0";
@@ -78,11 +83,19 @@ unixfs_preflight(char* dmg, char** type, struct unixfs** unixfsp)
             char symb[255];
             snprintf(symb, 255, "%s_%s", "unixfs",
                      filesystems[i].fstypename_canonical);
+#if __Crossmeta__
+            {
+            extern void *dlsym_ops_ufs;
+            *unixfsp = (struct unixfs*)&dlsym_ops_ufs;
+            break;
+            }
+#else
             void* impl = dlsym(RTLD_DEFAULT, symb);
             if (impl != NULL) {
                 *unixfsp = (struct unixfs*)impl;
                 break;
             }
+#endif
         }
     }
 
@@ -95,7 +108,11 @@ void
 unixfs_postflight(char* fsname, char* volname, char* extra_args)
 {
     snprintf(extra_args, UNIXFS_ARGLEN,
+#if __Crossmeta__
+        "-oro");
+#else
         "-oro,sparse,defer_permissions,daemon_timeout=5,"
         "volname=%s,fsname=%s File System",
         volname, fsname);
+#endif
 }

@@ -17,10 +17,17 @@
 #include <string.h>
 #include <unistd.h>
 #include <ctype.h>
+#ifndef __MINGW32__
 #include <dlfcn.h>
+#endif
 
+#ifdef __Crossmeta__
+#include <fuse_lowlevel.h>
+#include <fuse_opt.h>
+#else
 #include <fuse/fuse_opt.h>
 #include <fuse/fuse_lowlevel.h>
+#endif
 
 #define UNIXFS_META_TIMEOUT 60.0 /* timeout for nodes and their attributes */
 

@@ -7,6 +7,7 @@
 #include "ufs.h"
 #include "unixfs_common.h"
 
+#include <sys/stat.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -14,9 +15,16 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
-#include <sys/stat.h>
+#if __Crossmeta__
+#include <sys/fcntl.h>
+#define	__unused
+#endif
 
 DECL_UNIXFS("UFS", ufs);
+
+#if __Crossmeta__
+struct unixfs_ops *dlsym_ops_ufs = &ops_ufs;
+#endif
 
 static void*
 unixfs_internal_init(const char* dmg, uint32_t flags, __unused fs_endian_t fse,

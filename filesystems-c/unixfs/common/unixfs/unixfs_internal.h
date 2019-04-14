@@ -59,13 +59,26 @@ extern ssize_t pread(int fd, void *buf, size_t count, off_t offset);
 #error Endian Problem
 #endif
 
-#elif __FreeBSD__
+#elif __FreeBSD__ || __Crossmeta__
 
 #define ino64_t uint64_t
+#if __Crossmeta__
+#include <machine/endian.h>
+#define	le64toh(x)	(x)
+#define	be64toh(x)	__builtin_bswap64(x)
+#define	le32toh(x)	(x)
+#define	be32toh(x)	__builtin_bswap32(x)
+#define	le16toh(x)	(x)
+#define	be16toh(x)	__builtin_bswap16(x)
+#else
 #include <sys/endian.h>
+#endif
 
 #if BYTE_ORDER == LITTLE_ENDIAN
 #define __LITTLE_ENDIAN__ 1
+#define	OSSwapHostToLittleInt32(x)	(x)
+#define	OSSwapHostToBigInt32(x)	__builtin_bswap32(x)
+
 #elif BYTE_ORDER == BIG_ENDIAN
 #define __BIG_ENDIAN__ 1
 #else
@@ -148,7 +161,11 @@ typedef struct inode {
 #define I_atime      I_stat.st_atimespec
 #define I_mtime      I_stat.st_mtimespec
 #define I_ctime      I_stat.st_ctimespec
+#if __Crossmeta__	// XXX
+#define I_crtime     I_stat.st_ctimespec
+#else
 #define I_crtime     I_stat.st_birthtimespec
+#endif
 #if __linux__
 #define I_atime_sec  I_stat.st_atime
 #define I_mtime_sec  I_stat.st_mtime

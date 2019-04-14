@@ -1,10 +1,12 @@
 #ifndef _LINUX_TYPES_H_
 #define _LINUX_TYPES_H_
 
-#if defined(__APPLE__)
+#if defined(__APPLE__) || defined(__MINGW32__)
 
 #include <errno.h>
+#include <sys/param.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -12,7 +14,9 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <time.h>
+#if defined(__APPLE__)
 #include <libkern/OSByteOrder.h>
+#endif
 
 #define __force
 #define __bitwise

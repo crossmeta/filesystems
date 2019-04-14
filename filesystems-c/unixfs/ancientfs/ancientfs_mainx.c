@@ -15,7 +15,7 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <fcntl.h>
-#if __linux__ || __FreeBSD__
+#if __linux__ || __FreeBSD__ || __Crossmeta__
 #define __USE_GNU 1
 #define __private_extern__
 #endif

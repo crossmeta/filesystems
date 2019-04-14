@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include <sys/types.h>
 #include <sys/statvfs.h>
+#include <time.h>
 
 #define UNIXFS_MAXPATHLEN 1024
 #define UNIXFS_MAXNAMLEN  255
